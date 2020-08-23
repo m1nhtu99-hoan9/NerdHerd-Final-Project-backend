@@ -1,5 +1,6 @@
 import os
 from urllib.parse import urlparse
+import pymongo
 from pymongo import MongoClient
 
 USERNAME = "user0"
@@ -42,6 +43,7 @@ COLLECTIONS = {
         "staff_list",
         "expire_date",
     ),
+}
 """ END experimental code segment """
 
 if __name__ == "__main__":
@@ -49,11 +51,9 @@ if __name__ == "__main__":
     for debugging purpose
     """
 
-    # client: pymongo.mongo_client.MongoClient
-    client = MongoClient(DATABASE_URI)
+    client: pymongo.mongo_client.MongoClient = MongoClient(DATABASE_URI)
 
-    # db: pymongo.database.Database
-    db = client[DATABASE_NAME]
+    db: pymongo.database.Database = client[DATABASE_NAME]
 
     print(DATABASE_URI)
     print(type(db))
