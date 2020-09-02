@@ -7,6 +7,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from logzero import logger
 
+
 def create_app(config=None):
     app = Flask(__name__)
 
@@ -14,8 +15,8 @@ def create_app(config=None):
     app.config.update(dict(DEBUG=True))
     app.config.update(config or {})
 
-    # @ reference https://flask-cors.readthedocs.io/en/latest/
-    # Setup CORS headers 
+    # @reference https://flask-cors.readthedocs.io/en/latest/
+    # Setup CORS headers
     CORS(app)
 
     # Definition of the routes. Put them into their own file. See also
