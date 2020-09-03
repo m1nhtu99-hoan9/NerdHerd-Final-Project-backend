@@ -6,7 +6,7 @@
 - :punch: `get_otp_code`: Get random 6-digit OTP code
   - Params: None
   - Returns: `str`
-- :key: `send_otp_message`: When called, send text message to user's phone number containing OTP code
+- :key: :punch: `send_otp_message`: When called, send text message to user's phone number containing OTP code
   - Params: 
     - `session: requests_futures.sessions.FutureSession` (a `FutureSession` instance)
     - `phone_num: str` (customer's phone number) 
