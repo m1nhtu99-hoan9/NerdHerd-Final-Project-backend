@@ -1,3 +1,3 @@
 """
-  Regular Package of `api`
+  Stuffs related to external API sources
 """

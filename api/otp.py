@@ -83,10 +83,10 @@ if __name__ == "__main__":
     This section is for debugging purpose
     """
 
-    session = FuturesSession()
-    code, otp, data_body = send_otp_message(session, phone_num="0976162652")
+    # session = FuturesSession()
+    # code, otp, data_body = send_otp_message(session, phone_num="0976162652")
 
-    print(f"Status code: {code}, of type {type(code)}")
-    print(f"OTP code is {otp}")
-    print(f"Data received: of type {type(data_body)}")
-    print(f"...content: {data_body}")
+    # print(f"Status code: {code}, of type {type(code)}")
+    # print(f"OTP code is {otp}")
+    # print(f"Data received: of type {type(data_body)}")
+    # print(f"...content: {data_body}")
