@@ -15,6 +15,8 @@
 ## REFERENCES
 
 - Technical: 
+  - [Boilerplate used in this project](https://www.python-boilerplate.com/flask)
+  - [Introduction to Flask](https://opensource.com/article/18/4/flask)
   - [Keyworded arguments](https://book.pythontips.com/en/latest/args_and_kwargs.html)
   - [Asynchronous HTTP Requests for Humans using Futures](https://github.com/ross/requests-futures)
 - Non-technical

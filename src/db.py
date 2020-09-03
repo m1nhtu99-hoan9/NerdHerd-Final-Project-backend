@@ -1,12 +1,6 @@
 import os
-from urllib.parse import urlparse
 import pymongo
 from pymongo import MongoClient
-
-USERNAME = "user0"
-PASSWORD = "5gdGDHiTfYz0fKD2"
-DATABASE_NAME = "crescorex"
-DATABASE_URI = f"mongodb+srv://{USERNAME}:{PASSWORD}@cluster0-nzzqi.mongodb.net/{DATABASE_NAME}?retryWrites=true&w=majority"
 
 """ experimental code segment """
 COLLECTIONS = {
@@ -51,8 +45,8 @@ if __name__ == "__main__":
     for debugging purpose
     """
 
-    client: pymongo.mongo_client.MongoClient = MongoClient(DATABASE_URI)
-
+    # client: pymongo.mongo_client.MongoClient = MongoClient(DATABASE_URI)
+    client = MongoClient(app.config["DATABASE_URI"])
     db: pymongo.database.Database = client[DATABASE_NAME]
 
     print(DATABASE_URI)

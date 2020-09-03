@@ -1,7 +1,6 @@
 import os
 import sys
 import random
-from typing import NamedTuple  # typed named tuple
 from requests_futures.sessions import FuturesSession
 
 """
@@ -11,30 +10,13 @@ from requests_futures.sessions import FuturesSession
 DIR = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(DIR, "..")))
 
+from models import OTP_Params
 from utils.ds import json_loads_to_named_tuple
 
 """Notes
    - To convert a `named_tuple` to dictionary, do `named_tuple._asdict()`  
    - To get names of `named_tuple` fields, use `named_tuple._fields()`  
 """
-
-
-class OTP_Params(NamedTuple):
-    """
-    Modifiable params: `phone`, `otp_code`
-    
-    Default params: `api_key`, `secret_key`, `brand_name`, `sms_type`
-    """
-
-    phone: str
-    otp_code: str
-    api_key: str = "FC3105030010CFA43486E8487C94BA"
-    secret_key: str = "CCFE6EDD25DC8711DB78E4BFE704F0"
-    brand_name: str = "BaoTriXeMay"
-    # 1 means that message will be sent using a hotline number;
-    # 2 means that message will be sent using brand name
-    sms_type: int = 2
-
 
 def get_otp_code() -> str:
     """Get random 6-digit OTP code"""

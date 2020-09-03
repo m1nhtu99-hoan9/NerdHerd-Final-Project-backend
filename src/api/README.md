@@ -2,7 +2,6 @@
 
 ## `otp` Module
 
-- :page_with_curl: `OTP_Params`: Typed named tuple class modelling OTP request parameters 
 - :punch: `get_otp_code`: Get random 6-digit OTP code
   - Params: None
   - Returns: `str`
