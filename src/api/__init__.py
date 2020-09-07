@@ -1,3 +1,3 @@
 """
-  Stuffs related to external API sources
+  Stuffs related to third-party API sources
 """

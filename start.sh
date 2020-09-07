@@ -11,7 +11,9 @@ DATABASE_URI="mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0-nzzqi.mongodb
 
 export FLASK_APP
 export DATABASE_URI
+export DB_NAME
 export DEBUG='True'
-export FLASK_ENV=production 
+#export FLASK_ENV=production
+export FLASK_ENV=development
 
 flask run

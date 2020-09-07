@@ -5,22 +5,23 @@ from logzero import logger
 from pymongo import MongoClient
 
 from src.auth import login_manager
+from src import list_all_bps
+
 
 def create_app():
     app = Flask(__name__)
 
+    # intialise configurations
+    app.config.from_object("config.Config")
     # intialise plugins
     login_manager.init_app(app)
-
-    # @reference http://flask.pocoo.org/docs/latest/config/
-    app.config.from_object("config.Config")
-    app.config.update(dict(DEBUG=True))
-
-    # @reference https://flask-cors.readthedocs.io/en/latest/
     # Setup CORS headers
     CORS(app)
 
-    # Definition of the routes. Put them into their own file. See also
+    # Definition of the routes. Import all blueprints
+    for bp in list_all_bps:
+        app.register_blueprint(bp)
+    
     # Flask Blueprints: http://flask.pocoo.org/docs/latest/blueprints
     @app.route("/")
     def hello_world():

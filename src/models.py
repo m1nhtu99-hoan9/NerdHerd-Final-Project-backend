@@ -1,13 +1,27 @@
-import bcrypt
+from enum import Enum
+from datetime import datetime
+from typing import NamedTuple  # typed named tuple
 
-class User(UserMixin): 
-  phone_num: str
-  password: str
+# enumeration member names are seperated by space character
+# @reference https://docs.python.org/3/library/enum.html#functional-api
+USER_ROLES = Enum("USER_ROLES", "Staff")
 
-user = User()
-print(dir(user))
-print(vars(user))
+class User(NamedTuple):
+    full_name: str
+    phone: str
+    password: str
+    role: USER_ROLES
+    license_key: str
 
-hashed = bcrypt.hashpw(password=b"secret password", salt=bcrypt.gensalt())
+class Bank(NamedTuple):
+    bank_id: str
+    bank_name: str
+    license_key: str
+    branch: str
+    branch_id: str
+    staff_list: str
+    expired_date: datetime
 
-print(bcrypt.checkpw(b"secret password", hashed))
+class Customer(NamedTuple): 
+    phone: str,
+    credit_score: float
