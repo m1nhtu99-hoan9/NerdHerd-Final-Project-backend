@@ -1,11 +1,10 @@
 # NERDHERD BACKEND SERVICE
 
-## FEATURES
+## DOCUMENTATION
 
-- API
-  - [OTP](./api/otp.py)
-    - [x] get random 6-digit OTP code
-    - [x] trigger sending of OTP text message to customer's phone number
+### API DOCUMENTATION
+
+- [Swagger UI <still in progress>](https://app.swaggerhub.com/apis/minhtu-thomas-hoang9/nerdherd-crescorex/)
 
 ## INSTALLATION
 

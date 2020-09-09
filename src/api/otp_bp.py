@@ -10,16 +10,16 @@ def get_otp():
     phone = req.args.get("phone")
     if phone is None:
         # HTTP response code: 400
-        return { "message": "Invalid request! Please specify the phone number!" }, 400
+        return jsonify({ "message": "Invalid request! Please specify the phone number!" }), 400
     else
         # call the third-party API
         resp_code, otp_code, resp_body = send_otp_message(f_session, phone)
         if (resp_code < 300 and resp_code >= 200): 
             # HTTP response code 201 because new OTP is created to be consumed
-            return { "otp_code": otp_code }, 201
+            return jsonify({ "otp_code": otp_code }), 201
         else 
             # forward the error message received from OTP server
-            return { "message": jsonify(resp_body)}, 500
+            return jsonify({ "message": jsonify(resp_body) }), 500
 
 """
 TODOs for the next versions: 

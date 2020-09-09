@@ -10,6 +10,7 @@ click==7.1.2
 dnspython==2.0.0
 Flask==1.1.2
 Flask-Cors==3.0.8
+Flask-JWT-Extended==3.24.1
 idna==2.10
 isort==5.4.2
 itsdangerous==1.1.0

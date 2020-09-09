@@ -13,6 +13,7 @@ export FLASK_APP
 export DATABASE_URI
 export DB_NAME
 export DEBUG='True'
+export JWT_SECRET_KEY="anonymity"
 #export FLASK_ENV=production
 export FLASK_ENV=development
 

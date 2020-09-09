@@ -30,3 +30,7 @@ dir:
     "update",
     "values"
 ```
+
+## TODOs for the next versions
+
+- Change `/otp` from public route to protected route
