@@ -1,5 +1,7 @@
 # NERDHERD BACKEND SERVICE
 
+<still in development mode>
+
 ## DOCUMENTATION
 
 ### API DOCUMENTATION

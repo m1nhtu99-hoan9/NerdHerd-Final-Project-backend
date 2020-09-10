@@ -1,3 +1,0 @@
-"""
-  `utils` regular package
-"""

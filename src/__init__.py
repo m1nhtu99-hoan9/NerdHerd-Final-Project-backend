@@ -1,7 +1,6 @@
 """
-    Centralised module for all blueprints
+    Serve as index module
 """
 
-from api import otp_bp
-
-list_all_bps = (otp_bp)
+from .auth_routes import supplement_auth_routes
+from .otp_routes import suppliment_otp_routes

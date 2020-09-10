@@ -1,17 +1,34 @@
-import os
-import sys
+from typing import NamedTuple  # typed named tuple
+from collections import namedtuple
+import json
 import random
 from requests_futures.sessions import FuturesSession
 
-"""
-    Add parent folder into system's list of path so that
-    modules from `utils` folder can be accessed
-"""
-DIR = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(os.path.join(DIR, "..")))
+def json_loads_to_named_tuple(jsonified_string: str, type_name: str):
+    """Description: 
+        convert `jsonified_string` into a list of named tuples
+        or an named tuple having type of `type_name`
+    """
+    return json.loads(
+        jsonified_string,
+        object_hook=lambda d: namedtuple(type_name, d.keys())(*d.values()),
+    )
 
-from models import OTP_Params
-from utils.ds import json_loads_to_named_tuple
+class OTP_Params(NamedTuple):
+    """
+    Modifiable params: `phone`, `otp_code`
+    
+    Default params: `api_key`, `secret_key`, `brand_name`, `sms_type`
+    """
+
+    phone: str
+    otp_code: str
+    api_key: str = "FC3105030010CFA43486E8487C94BA"
+    secret_key: str = "CCFE6EDD25DC8711DB78E4BFE704F0"
+    brand_name: str = "BaoTriXeMay"
+    # 1 means that message will be sent using a hotline number;
+    # 2 means that message will be sent using brand name
+    sms_type: int = 2
 
 """Notes
    - To convert a `named_tuple` to dictionary, do `named_tuple._asdict()`  
@@ -59,16 +76,17 @@ def send_otp_message(session: FuturesSession, phone_num: str):
 
     return resp.status_code, otp_code, resp_body
 
-
 if __name__ == "__main__":
     """
     This section is for debugging purpose
     """
 
-    # session = FuturesSession()
-    # code, otp, data_body = send_otp_message(session, phone_num="0976162652")
+    session = FuturesSession()
+    code, otp, data_body = send_otp_message(session, phone_num="0976162652")
 
-    # print(f"Status code: {code}, of type {type(code)}")
-    # print(f"OTP code is {otp}")
-    # print(f"Data received: of type {type(data_body)}")
-    # print(f"...content: {data_body}")
+    print(f"Status code: {code}, of type {type(code)}")
+    print(f"OTP code is {otp}")
+    print(f"Data received: of type {type(data_body)}")
+    print(f"...content: {data_body}")
+
+
