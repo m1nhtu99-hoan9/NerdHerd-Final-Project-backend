@@ -1,1 +1,1 @@
-web: gunicorn wsgi:heroku_app
+web: gunicorn "app:create_app()"
