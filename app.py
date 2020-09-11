@@ -6,16 +6,6 @@ from flask_jwt_extended import JWTManager
 
 from src import supplement_routes
 
-from base64 import b64decode, b64encode
-
-
-def atob(byted_str: str) -> str:
-    """ Convert a base-64 encrypted string to decrypted form """
-    base64_bytes = byted_str.encode("ascii")
-    ascii_bytes = b64decode(base64_bytes)
-    return ascii_bytes.decode("ascii")
-
-
 def create_app():
     """ FLASK APP FACTORY """
     app = Flask(__name__)

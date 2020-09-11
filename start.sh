@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Configuration for Flask app on Heroku environment
+# heroku config:set VAR=VALUE --app nerdherd-crescorex
 FLASK_APP=./app.py 
 
 DB_USERNAME="user0"
@@ -12,9 +13,8 @@ export FLASK_APP
 export DATABASE_URI
 export DB_NAME
 export DEBUG="True"
-#export FLASK_ENV=production
-export FLASK_ENV=development
-
+export FLASK_ENV="production"
+#export FLASK_ENV=development
 
 # Configuration for `flask_jwt_extended` 
 export JWT_SECRET_KEY="anonymity"
