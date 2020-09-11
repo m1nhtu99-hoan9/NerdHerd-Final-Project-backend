@@ -2,11 +2,11 @@ from pymongo import MongoClient, ReturnDocument
 from flask_jwt_extended import jwt_required
 
 
-def _supplement_crescore_route(app):
+def _supplement_crescore_route(cur_app):
     """
         Supplement route to query credit score
 
-        :param: `app`: <class 'flask.app.Flask'>
+        :param: `cur_app`: <class 'flask.app.Flask'>
     """
 
     DB_URI = cur_app.config["DATABASE_URI"]
@@ -50,18 +50,18 @@ def _supplement_crescore_route(app):
 
                 # add requested phone number to current user's search history
                 user_col.update_one(
-                    filter={"Phone": user_phone}
+                    filter={"Phone": user_phone},
                     update={"$push": {"SearchHistory": req_phone}}
                 )
 
                 # HTTP response code 200
                 return { "score": customer_doc["CreditScore"] }, 200
             
-def _supplement_profile_route(app): 
+def _supplement_profile_route(cur_app): 
     """
         Supplement route to get current user's profile
 
-        :param: `app`: <class 'flask.app.Flask'>
+        :param: `cur_app`: <class 'flask.app.Flask'>
     """
 
     DB_URI = cur_app.config["DATABASE_URI"]
@@ -69,7 +69,7 @@ def _supplement_profile_route(app):
 
     @cur_app.route("/profile", methods=["GET"])
     @jwt_required
-    def query_crescore():
+    def query_profile_info():
         """ Check access token """
         # `get_jwt_identity` decodes JWT in "Authorization" header of the request,
         #  decode it and then return the identity (which is current app's user phone number)
@@ -98,7 +98,7 @@ def _supplement_profile_route(app):
                 "full_name": user_doc["FullName"],
                 "bank_id": user_doc["BankID"],
                 "user_id": user_doc["UID"],
-                "email": user_doc["Email"]
+                "email": user_doc["Email"],
                 "search_history": user_doc["SearchHistory"]
             }, 200
 

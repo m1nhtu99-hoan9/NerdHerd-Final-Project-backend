@@ -4,7 +4,7 @@ from logzero import logger
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager
 
-from src import supplement_auth_routes, suppliment_otp_routes
+from src import supplement_routes
 
 from base64 import b64decode, b64encode
 
@@ -57,21 +57,8 @@ def create_app():
 
     # supplement route definitions to this Flask `app`
     # <!-- not the most professional way to do it but at least I get the job done (；一_一) -->
-    supplement_auth_routes(app)
-    suppliment_otp_routes(app)
-
-    @app.route("/")
-    def hello_world():
-        logger.info("/")
-        return "Hello World"
-
-    @app.route("/basic_auth")
-    def handle_basic_auth():
-        # basic_auth = f"Bearer {encoded_credentials}"
-        basic_auth = request.headers.get("Authorization")
-        encoded_credentials = basic_auth.split("Basic ")[1]
-        decoded_creds = atob(encoded_credentials)
-        return {"data": decoded_creds, "type": str(type(encoded_credentials))}, 200
+    for supplement_route in supplement_routes:
+        supplement_route(app)
 
     @app.route("/debug/route_list")
     def debug_route_list():
@@ -79,14 +66,21 @@ def create_app():
         headers = request.headers
         return jsonify({"routes": result, "type_info": {"app": str(type(app))}})
 
+    @app.route("/debug/config")
+    def debug_app_config():
+        config = app.config
+        return jsonify(str(config))
+
     return app
 
 
 if __name__ == "__main__":
     app = create_app()
-    port = app.config["PORT"]
-
-    app.run(host="127.0.0.1", port=port, debug=app.config["DEBUG"])
+    if app.config["ENV"] == "development": 
+        port = app.config["PORT"]
+        app.run(host="127.0.0.1", port=port, debug=app.config["DEBUG"])
+    else:
+        app.run()
 
 """ Side notes:
     - In local environment, to import a global config variable (defined in ./venv/bin/activate),

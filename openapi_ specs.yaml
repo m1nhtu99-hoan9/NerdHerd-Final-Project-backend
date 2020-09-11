@@ -1,4 +1,4 @@
-swagger: '2.0'
+openapi: "3.0.0"
 info:
   description: OPENAPI Documentation for NerdHerd Backend service
   version: 1.0.0-oas3
@@ -7,12 +7,12 @@ info:
     email: minhtu.hoang19@gmai.com
   license:
     name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 
 tags:
   - name: public
     description: Public routes
-  - name: private
+  - name: protected
     description: Routes require JWT authorisation header
 
 paths:
@@ -21,25 +21,29 @@ paths:
       tags:
         - public
       summary: login route
-      description: |
+      description: login route
         Login route
-      security: 
+      security:
         - BasicAuth: []
-      produces:
-        - application/json
       responses:
-        '201':
+        "201":
           description: login successfully with new JWT generated
-          schema:            
-            $ref: '#/definitions/responses/Jwt201'
-        '400':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Jwt201"
+        "400":
           description: login credentials are incorrect
-          schema:
-            $ref: '#/definitions/responses/Login400'
-        '500':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Login400"
+        "500":
           description: internal server error (bugs in code or database connection error)
-          schema: 
-            $ref: '#/definitions/generalResponses/InternalServerError'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
   /auth/logout:
     post:
       tags:
@@ -48,165 +52,317 @@ paths:
       description: Logout route
       security:
         - BearerAuth: []
-      produces:
-        - application/json
       responses:
-        '200':
+        "200":
           description: logged out successfully
-          schema:
-            $ref: '#/definitions/generalResponses/Successful'
-        '500':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Successful"
+        "401":
+          description: token expired or revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unauthorised"
+        "500":
           description: internal server error (bugs in code or database connection error)
-          schema: 
-            $ref: '#/definitions/generalResponses/InternalServerError'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
   /auth/register:
     post:
       tags:
-        - protected
+        - public
       summary: register route
-      description: Register route
-      requestBody: 
+      description: Register new user account
+      requestBody:
         required: true
         content:
           application/json:
-            schema: 
-              $ref: 
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-       - in: query
-          name:
-          description: pass an optional search string for looking up inventory
-          required: false
-          type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          type: integer
-          format: int32
-          minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          type: integer
-          format: int32
-          minimum: 0
-        - in: body
-          name: inventoryItem
-          description: Inventory item to add
-          schema:
-            $ref: '#/definitions/InventoryItem'
-          maximum: 50
+            schema:
+              $ref: "#/components/schemas/RegisterUser"
       responses:
-        '201':
-          description: item created
+        "201":
+          description: new user successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Register201"
+        "403":
+          description: invalid license key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Forbidden"
+        "409":
+          description: an user with the same email/phone number already existed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Register409"
+        "500":
+          description: internal server error (bugs in code or database connection error)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /otp:
+    get:
+      tags:
+        - protected
+      summary: request an OTP code
+      description: request an OTP code to be sent to customer's phone number
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: phone
+          required: true
+          schema:
+            type: string
+            example: "0123465987"
+      responses:
+        "201":
+          description: new OTP code generated and sent back
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Otp201"
+        "401":
+          description: user token is missing (not found in request header) or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unauthorised"
+        "500":
+          description: internal server error (bugs in code or database connection error)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /crescore: 
+    get:
+      tags: 
+        - protected
+      summary: query customer's credit score
+      description: query customer's credit score
+      security:
+        - BearerAuth: []
+      parameters: 
+        - in: query
+          name: phone
+          schema: 
+            type: string
+            example: "0123465987"
+      responses:
+        '200':
+          description: request successfully resolved 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/CreScore200'
         '400':
-          description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
+          description: phone number missing in request query or invalid
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: unauthorised access
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Unauthorised'
+        '500':
+          description: internal server error (bugs in code or database connection error)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /profile:
+    get:
+      tags: 
+        - protected
+      summary: query user's profile
+      description: >-
+        Query user's profile to display in User Profile screen and Home Screen (search history). 
+        User's phone number is extracted from the token access attached with request header.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: request successfully resolved 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User200'
+        '401':
+          description: unauthorised access (token missing or invalid)
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Unauthorised'
+        '500':
+          description: internal server error (bugs in code or database connection error)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
-securityDefinitions: 
-  BasicAuth: 
-    type: http
-    schema: basic
-  BearerAuth: 
-    type: http
-    schema: bearer
-definitions:
-  requests: 
-    Register: 
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    RegisterUser:
       type: object
-      required: 
+      required:
         - full_name
         - phone
         - email
         - password
         - license_key
         - role
-      properties: 
+      properties:
         full_name:
           type: string
-          example: "John Doe" 
+          example: "John Doe"
         phone:
           type: string
           example: "john_doe@gmail.com"
-        email: 
+        email:
           type: string
           example: "0124365897"
-        password: 
+        password:
           type: string
           example: "*password*"
         license_key:
           type: string
           example: "Y9MXSIF79O"
-        role: 
+        role:
           type: string
           example: "Staff"
-  responses: 
-    Jwt201: 
+    User200:
       type: object
-      required: 
+      required:
+        - phone
+        - full_name
+        - bank_id
+        - user_id
+        - email
+        - search_history
+      properties:
+        phone:
+          type: string
+          example: "0132645978"
+        full_name:
+          type: string
+          example: "Minh Tu Hoang"
+        bank_id:
+          type: string
+          example: "BIDV"
+        user_id:
+          type: string
+          example: "TCB2444666666"
+        email:
+          type: string
+          example: "minhtu.hoang19@gmail.com"
+        search_history: 
+          type: array
+          items: 
+            type: string
+            example: "01247896325"
+    Otp201:
+      type: object
+      required:
+        - otp_code
+      properties:
+        otp_code:
+          type: string
+          example: "086547"
+    Jwt201:
+      type: object
+      required:
         - jwt
-      properties: 
+      properties:
         jwt:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-    Login400: 
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    CreScore200: 
       type: object
       required: 
-        - message
+        - score
       properties: 
-        message: 
+        score:
+          type: number
+          example: 0.69
+    Login400:
+      type: object
+      required:
+        - message
+      properties:
+        message:
           type: string
-          example: Your login credentials are incorrect. Please re-check!
-  generalResponses: 
+          example: "Your login credentials are incorrect. Please re-check!"
+    Register409:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "This user already existed. Forgot password?"
+    Register201:
+      type: object
+      required:
+        - db_user_id
+      properties:
+        db_user_id:
+          type: string
+          example: "5f5ae8fd231b91224ef4ed89"
     Successful:
       type: object
-      required: 
+      required:
         - message
       properties:
         message:
           type: string
-          example: Request successfully resolved!
+          example: "Request successfully resolved!"
     BadRequest:
       type: object
-      required: 
-        - message
-      properties: 
-        message: 
-          type: string
-          example: Important fields are missing or invalid. Please re-check!
-    Unauthorised:
-      type: object
-      required: 
-        - message
-      properties: 
-        message: 
-          type: string
-          example: Unauthorised access!
-    Forbidden:
-      type: object
-      required: 
-        - message
-      properties: 
-        message:
-          type: string
-          example: Invalid license key. Please re-check!
-    InternalServerError: 
-      type: object
-      required: 
-        - message
-      properties: 
-        message:
-          type: string
-          example: Internal server error detected.
-    ConflictResourceResponse: 
-      type: object
-      required: 
+      required:
         - message
       properties:
-        message: 
+        message:
           type: string
-          example: Your request is in conflict with server's resources
+          example: "Important fields are missing or invalid. Please re-check!"
+    Unauthorised:
+      type: object
+      required:
+        - msg
+      properties:
+        msg:
+          type: string
+          example: "Your token is expired or has been revoked. Please re-login!"
+    Forbidden:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Invalid license key. Please re-check!"
+    InternalServerError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Internal server error detected."

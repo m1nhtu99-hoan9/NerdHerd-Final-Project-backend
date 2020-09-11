@@ -5,9 +5,9 @@ from .api import send_otp_message
 
 f_session = FuturesSession() # to be consumed by `send_otp_message` function call
 
-def suppliment_otp_routes(cur_app):
+def supplement_otp_routes(cur_app):
     """
-        Suppliment OTP routes to the given Flask app object
+        Supplement OTP routes to the given Flask app object
 
         :param: `cur_app`: <class 'flask.app.Flask'> 
     """
