@@ -22,4 +22,6 @@ export JWT_BLACKLIST_ENABLED="True"
 
 # Start Flask app
 
-flask run
+pip install -r requirements
+pip freeze > requirements.txt
+python3 app.py
