@@ -1,0 +1,212 @@
+swagger: '2.0'
+info:
+  description: OPENAPI Documentation for NerdHerd Backend service
+  version: 1.0.0-oas3
+  title: CreScorex API
+  contact:
+    email: minhtu.hoang19@gmai.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+tags:
+  - name: public
+    description: Public routes
+  - name: private
+    description: Routes require JWT authorisation header
+
+paths:
+  /auth/login:
+    get:
+      tags:
+        - public
+      summary: login route
+      description: |
+        Login route
+      security: 
+        - BasicAuth: []
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: login successfully with new JWT generated
+          schema:            
+            $ref: '#/definitions/responses/Jwt201'
+        '400':
+          description: login credentials are incorrect
+          schema:
+            $ref: '#/definitions/responses/Login400'
+        '500':
+          description: internal server error (bugs in code or database connection error)
+          schema: 
+            $ref: '#/definitions/generalResponses/InternalServerError'
+  /auth/logout:
+    post:
+      tags:
+        - protected
+      summary: logout route
+      description: Logout route
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: logged out successfully
+          schema:
+            $ref: '#/definitions/generalResponses/Successful'
+        '500':
+          description: internal server error (bugs in code or database connection error)
+          schema: 
+            $ref: '#/definitions/generalResponses/InternalServerError'
+  /auth/register:
+    post:
+      tags:
+        - protected
+      summary: register route
+      description: Register route
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: 
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+       - in: query
+          name:
+          description: pass an optional search string for looking up inventory
+          required: false
+          type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          type: integer
+          format: int32
+          minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          type: integer
+          format: int32
+          minimum: 0
+        - in: body
+          name: inventoryItem
+          description: Inventory item to add
+          schema:
+            $ref: '#/definitions/InventoryItem'
+          maximum: 50
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+
+securityDefinitions: 
+  BasicAuth: 
+    type: http
+    schema: basic
+  BearerAuth: 
+    type: http
+    schema: bearer
+definitions:
+  requests: 
+    Register: 
+      type: object
+      required: 
+        - full_name
+        - phone
+        - email
+        - password
+        - license_key
+        - role
+      properties: 
+        full_name:
+          type: string
+          example: "John Doe" 
+        phone:
+          type: string
+          example: "john_doe@gmail.com"
+        email: 
+          type: string
+          example: "0124365897"
+        password: 
+          type: string
+          example: "*password*"
+        license_key:
+          type: string
+          example: "Y9MXSIF79O"
+        role: 
+          type: string
+          example: "Staff"
+  responses: 
+    Jwt201: 
+      type: object
+      required: 
+        - jwt
+      properties: 
+        jwt:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    Login400: 
+      type: object
+      required: 
+        - message
+      properties: 
+        message: 
+          type: string
+          example: Your login credentials are incorrect. Please re-check!
+  generalResponses: 
+    Successful:
+      type: object
+      required: 
+        - message
+      properties:
+        message:
+          type: string
+          example: Request successfully resolved!
+    BadRequest:
+      type: object
+      required: 
+        - message
+      properties: 
+        message: 
+          type: string
+          example: Important fields are missing or invalid. Please re-check!
+    Unauthorised:
+      type: object
+      required: 
+        - message
+      properties: 
+        message: 
+          type: string
+          example: Unauthorised access!
+    Forbidden:
+      type: object
+      required: 
+        - message
+      properties: 
+        message:
+          type: string
+          example: Invalid license key. Please re-check!
+    InternalServerError: 
+      type: object
+      required: 
+        - message
+      properties: 
+        message:
+          type: string
+          example: Internal server error detected.
+    ConflictResourceResponse: 
+      type: object
+      required: 
+        - message
+      properties:
+        message: 
+          type: string
+          example: Your request is in conflict with server's resources

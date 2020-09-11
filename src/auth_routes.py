@@ -1,5 +1,3 @@
-import os
-import sys
 from base64 import b64decode, b64encode
 from flask import request as req, jsonify
 from pymongo import MongoClient, ReturnDocument
@@ -65,7 +63,7 @@ def _suppliment_login_route(cur_app):
         if user_doc is None:
             # HTTP response code 400: bad request ¯\_(ツ)_/¯
             return (
-                jsonify({"message": "Requested user not existed. Please re-check!"}),
+                jsonify({"message": "Your login credentials are incorrect. Please re-check!"}),
                 400,
             )
         else:
