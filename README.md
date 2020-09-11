@@ -1,6 +1,11 @@
 # NERDHERD BACKEND SERVICE
 
-<still in development mode>
+Team members: 
+- [Ngô Tài Phát](https://github.com/PhatsNgoo): Project manager
+- [Hoàng Minh Tú](https://github.com/mnhthng-thms): Backend developer; Frontend developer
+- [Đỗ Trung Đức](https://github.com/duc1807): Frontend developer
+- [Nguyễn Minh Quân](https://github.com/minhquanym): Data scientist
+- [Lê Vũ Quang](https://github.com/vuquang23): Data scientist
 
 ## DOCUMENTATION
 
@@ -11,15 +16,6 @@
 
 ## INSTALLATION
 
-For local Linux environment, run the script [`start.sh`](./start.sh)
+- For local Linux environment, run the script [`start.sh`](./start.sh)
+- For deployment to Heroku, add environmental variables listed in [`start.sh`](./start.sh) to production server. Then, Heroku will automatically build as specified in [`Procfile`](./Procfile)
 
-## REFERENCES
-
-- Technical: 
-  - [Boilerplate used in this project](https://www.python-boilerplate.com/flask)
-  - [Introduction to Flask](https://opensource.com/article/18/4/flask)
-  - [Keyworded arguments](https://book.pythontips.com/en/latest/args_and_kwargs.html)
-  - [Asynchronous HTTP Requests for Humans using Futures](https://github.com/ross/requests-futures)
-  - [Deploy to Heroku](https://hack4impact.github.io/flask-base/deploy/)
-- Non-technical
-  - [Git Commit Emoji Convention](https://gist.github.com/parmentf/035de27d6ed1dce0b36a)
