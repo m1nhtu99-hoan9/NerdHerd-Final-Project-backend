@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request, Response
-from flask_cors import CORS
 from logzero import logger
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager
@@ -12,9 +11,6 @@ def create_app():
 
     """ intialise configurations """
     app.config.from_object("config.Config")
-
-    """ Setup CORS headers """
-    CORS(app)
 
     """ intialise plugins """
     # flask_jwt_extended need config variable `JWT_SECRET_KEY`

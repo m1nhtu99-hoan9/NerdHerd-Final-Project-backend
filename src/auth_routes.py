@@ -27,7 +27,7 @@ def _suppliment_login_route(cur_app):
     DB_URI = cur_app.config["DATABASE_URI"]
     DB_NAME = cur_app.config["DATABASE_NAME"]
 
-    @cur_app.route("/auth/login", methods=["POST"])
+    @cur_app.route("/auth/login", methods=["GET"])
     def handle_login():
         """
             Extract login credentials from BasicAuth request header,
