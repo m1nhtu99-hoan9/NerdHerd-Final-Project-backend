@@ -1,3 +1,5 @@
+# published at: https://app.swaggerhub.com/apis/minhtu-thomas-hoang9/nerdherd-crescorex-api/1.0.1
+
 openapi: "3.0.0"
 info:
   description: OPENAPI Documentation for NerdHerd Backend service
@@ -6,8 +8,7 @@ info:
   contact:
     email: minhtu.hoang19@gmai.com
   license:
-    name: Apache 2.0
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    name: MIT licensed
 
 tags:
   - name: public
@@ -41,13 +42,13 @@ paths:
         "500":
           description: internal server error (bugs in code or database connection error)
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
             text/plain:
               schema:
                 type: string
                 example: "Internal server error"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
   /auth/logout:
     post:
@@ -73,13 +74,14 @@ paths:
         "500":
           description: internal server error (bugs in code or database connection error)
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
             text/plain:
               schema:
                 type: string
                 example: "Internal server error"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
   /auth/register:
     post:
       tags:
@@ -114,13 +116,14 @@ paths:
         "500":
           description: internal server error (bugs in code or database connection error)
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
             text/plain:
               schema:
                 type: string
                 example: "Internal server error"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
   /otp:
     get:
       tags:
@@ -152,13 +155,14 @@ paths:
         "500":
           description: internal server error (bugs in code or database connection error)
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
             text/plain:
               schema:
                 type: string
                 example: "Internal server error"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
   /crescore:
     get:
       tags:
@@ -195,13 +199,14 @@ paths:
         "500":
           description: internal server error (bugs in code or database connection error)
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
             text/plain:
               schema:
                 type: string
                 example: "Internal server error"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
   /profile:
     get:
       tags:
@@ -228,13 +233,13 @@ paths:
         "500":
           description: internal server error (bugs in code or database connection error)
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
             text/plain:
               schema:
                 type: string
                 example: "Internal server error"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
 components:
   securitySchemes:
@@ -304,15 +309,15 @@ components:
           type: array
           items:
             type: object
-            required: 
+            required:
               - customer_phone
               - credit_score
-            properties: 
-              customer_phone: 
+            properties:
+              customer_phone:
                 type: string
                 example: "0123465789"
-              customer_score: 
-                type: float
+              customer_score:
+                type: number
                 example: 0.78945145
 
             example: "01247896325"

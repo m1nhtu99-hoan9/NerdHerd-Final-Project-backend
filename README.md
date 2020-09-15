@@ -11,7 +11,7 @@ Team members:
 
 ### API DOCUMENTATION
 
-- Swagger documentation is available online at [this link](https://app.swaggerhub.com/apis-docs/minhtu-thomas-hoang9/nerdherd-crescorex-api/1.0.0-oas3)
+- Swagger documentation is available online at [this link](https://app.swaggerhub.com/apis-docs/minhtu-thomas-hoang9/nerdherd-crescorex-api/)
 - Documentation on this service's features is available in this repo at [`./src/README.md`](./src/README.md)
 
 ## INSTALLATION
