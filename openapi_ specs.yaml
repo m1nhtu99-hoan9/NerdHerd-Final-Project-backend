@@ -44,6 +44,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+            text/plain:
+              schema:
+                type: string
+                example: "Internal server error"
+
   /auth/logout:
     post:
       tags:
@@ -71,6 +76,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+            text/plain:
+              schema:
+                type: string
+                example: "Internal server error"
   /auth/register:
     post:
       tags:
@@ -108,6 +117,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+            text/plain:
+              schema:
+                type: string
+                example: "Internal server error"
   /otp:
     get:
       tags:
@@ -142,48 +155,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
-  /crescore: 
+            text/plain:
+              schema:
+                type: string
+                example: "Internal server error"
+  /crescore:
     get:
-      tags: 
+      tags:
         - protected
       summary: query customer's credit score
       description: query customer's credit score
       security:
         - BearerAuth: []
-      parameters: 
+      parameters:
         - in: query
           name: phone
-          schema: 
+          schema:
             type: string
             example: "0123465987"
       responses:
-        '200':
-          description: request successfully resolved 
+        "200":
+          description: request successfully resolved
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/CreScore200'
-        '400':
+              schema:
+                $ref: "#/components/schemas/CreScore200"
+        "400":
           description: phone number missing in request query or invalid
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/BadRequest'
-        '401':
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "401":
           description: unauthorised access
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/Unauthorised'
-        '500':
+              schema:
+                $ref: "#/components/schemas/Unauthorised"
+        "500":
           description: internal server error (bugs in code or database connection error)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+            text/plain:
+              schema:
+                type: string
+                example: "Internal server error"
   /profile:
     get:
-      tags: 
+      tags:
         - protected
       summary: query user's profile
       description: >-
@@ -192,33 +213,39 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
-          description: request successfully resolved 
+        "200":
+          description: request successfully resolved
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/User200'
-        '401':
+              schema:
+                $ref: "#/components/schemas/User200"
+        "401":
           description: unauthorised access (token missing or invalid)
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/Unauthorised'
-        '500':
+              schema:
+                $ref: "#/components/schemas/Unauthorised"
+        "500":
           description: internal server error (bugs in code or database connection error)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+            text/plain:
+              schema:
+                type: string
+                example: "Internal server error"
 
 components:
   securitySchemes:
     BasicAuth:
       type: http
       scheme: basic
+      description: For encryption of login credentials in login route
     BearerAuth:
       type: http
       scheme: bearer
+      description: Using JWT for user session management
   schemas:
     RegisterUser:
       type: object
@@ -273,10 +300,21 @@ components:
         email:
           type: string
           example: "minhtu.hoang19@gmail.com"
-        search_history: 
+        search_history:
           type: array
-          items: 
-            type: string
+          items:
+            type: object
+            required: 
+              - customer_phone
+              - credit_score
+            properties: 
+              customer_phone: 
+                type: string
+                example: "0123465789"
+              customer_score: 
+                type: float
+                example: 0.78945145
+
             example: "01247896325"
     Otp201:
       type: object
@@ -294,11 +332,11 @@ components:
         jwt:
           type: string
           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-    CreScore200: 
+    CreScore200:
       type: object
-      required: 
+      required:
         - score
-      properties: 
+      properties:
         score:
           type: number
           example: 0.69
