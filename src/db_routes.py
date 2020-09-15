@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, request as req
 from pymongo import MongoClient, ReturnDocument
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -56,7 +56,7 @@ def _supplement_crescore_route(cur_app):
                 )
 
                 # HTTP response code 200
-                return {"score": customer_doc["CreditScore"]}, 200
+                return {"phone": req_phone, "score": customer_doc["CreditScore"]}, 200
 
 
 def _supplement_profile_route(cur_app):

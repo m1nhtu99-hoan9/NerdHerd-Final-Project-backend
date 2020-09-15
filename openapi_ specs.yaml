@@ -340,8 +340,12 @@ components:
     CreScore200:
       type: object
       required:
+        - phone
         - score
       properties:
+        phone: 
+          type: string
+          example: "0914258763" 
         score:
           type: number
           example: 0.69
