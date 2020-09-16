@@ -46,12 +46,8 @@ def _suppliment_login_route(cur_app):
         for field in [PHONE, RAW_PASSWORD]:
             if field is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                return (
-                    jsonify(
-                        {"message": "Important fields are missing. Please re-check!"}
-                    ),
-                    400,
-                )
+                return {"message": "Important fields are missing. Please re-check!"}, 400
+                
 
         """ authenticate """
         client = MongoClient(host=DB_URI)
@@ -62,10 +58,8 @@ def _suppliment_login_route(cur_app):
 
         if user_doc is None:
             # HTTP response code 400: bad request ¯\_(ツ)_/¯
-            return (
-                jsonify({"message": "Your login credentials are incorrect. Please re-check!"}),
-                400,
-            )
+            return jsonify({"message": "Your login credentials are incorrect. Please re-check!"}), 400
+            
         else:
             user_hashed_pwd = user_doc["Password"]
             if user_hashed_pwd is None:
@@ -144,12 +138,8 @@ def _suppliment_register_route(cur_app):
         for field in [FULL_NAME, PHONE, EMAIL, RAW_PASSWORD, LICENSE_KEY]:
             if field is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                return (
-                    jsonify(
-                        {"message": "Important fields are missing. Please re-check!"}
-                    ),
-                    400,
-                )
+                return {"message": "Important fields are missing. Please re-check!"},400
+                
 
         """ check if there is an user with this profile information already existed """
         client = MongoClient(host=DB_URI)
@@ -165,10 +155,7 @@ def _suppliment_register_route(cur_app):
 
         if dupl_user is not None:
             # HTTP response code 409: request is in conflict with server's resources ｡゜(｀Д´)゜｡
-            return (
-                jsonify({"message": "This user already existed. Forgot password?"}),
-                409,
-            )
+            return {"message": "This user already existed. Forgot password?"}, 409            
         else:
             """ Check validity of the submitted license key """
             bank_col = db["bank"]
@@ -191,10 +178,8 @@ def _suppliment_register_route(cur_app):
                 return jsonify({"db_user_id": db_user_id}), 201
             else:
                 # HTTP response code 403: Forbidden （╯°□°）╯︵( .o.)
-                return (
-                    jsonify({"message": "Invalid license key. Please re-check!"}),
-                    403,
-                )
+                return {"message": "Invalid license key. Please re-check!"}, 403
+                
 
 def supplement_auth_routes(app):
     """
