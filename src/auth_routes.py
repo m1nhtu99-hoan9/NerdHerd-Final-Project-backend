@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 from datetime import timedelta
 from logzero import logger  # console logger
 
-from .utils import check_password, hash_password, encode_token, decode_token, atob  
+from .utils import check_password, hash_password, encode_token, decode_token, atob
 
 """
     Define authentication routes
@@ -41,13 +41,18 @@ def _suppliment_login_route(cur_app):
         decoded_credentials = atob(encoded_credentials)
         PHONE, RAW_PASSWORD = decoded_credentials.split(":")
 
-        logger.info(f"original credential string: {encoded_credentials}");
+        logger.info(f"original credential string: {encoded_credentials}")
         """ validation """
         for field in [PHONE, RAW_PASSWORD]:
             if field is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                return {"message": "Important fields are missing. Please re-check!"}, 400
-                
+                return (
+                    jsonify(
+                        {"message": "Important fields are missing. Please re-check!"}
+                    ),
+                    400,
+                    {"Content-Type": "application/json"},
+                )
 
         """ authenticate """
         client = MongoClient(host=DB_URI)
@@ -58,8 +63,16 @@ def _suppliment_login_route(cur_app):
 
         if user_doc is None:
             # HTTP response code 400: bad request ¯\_(ツ)_/¯
-            return jsonify({"message": "Your login credentials are incorrect. Please re-check!"}), 400
-            
+            return (
+                jsonify(
+                    {
+                        "message": "Your login credentials are incorrect. Please re-check!"
+                    }
+                ),
+                400,
+                {"Content-Type": "application/json"},
+            )
+
         else:
             user_hashed_pwd = user_doc["Password"]
             if user_hashed_pwd is None:
@@ -69,10 +82,12 @@ def _suppliment_login_route(cur_app):
 
             if check_password(RAW_PASSWORD, user_hashed_pwd):
                 # generate token string, in which `PHONE` is used as identification data
-                token = create_access_token(identity=PHONE, expires_delta=timedelta(minutes=15))
+                token = create_access_token(
+                    identity=PHONE, expires_delta=timedelta(minutes=15)
+                )
                 logger.info(f"Token generated: {token}")
                 # HTTP response code 201, ~(˘▾˘~) of which body contains a generated JWT code (~˘▾˘)~
-                return jsonify({"jwt": token}), 201
+                return jsonify({"jwt": token}), 201, {"Content-Type": "application/json"}
 
 
 def _suppliment_logout_route(cur_app):
@@ -109,11 +124,11 @@ def _suppliment_logout_route(cur_app):
         if returned_doc is not None:
             logger.info("Logout request successfully handled.")
             # HTTP response code 200: request succeeded
-            return {"message": "Successfully logged out!"}, 200
+            return jsonify({"message": "Successfully logged out!"}), 200, {"Content-Type": "application/json"}
         else:
             logger.info("Connection with database is down.")
             # HTTP response code 500: internal server error (❍ᴥ❍ʋ)
-            return {"message": "Internal server error!"}, 500
+            return jsonify({"message": "Internal server error!"}), 500, {"Content-Type": "application/json"}
 
 
 def _suppliment_register_route(cur_app):
@@ -138,8 +153,10 @@ def _suppliment_register_route(cur_app):
         for field in [FULL_NAME, PHONE, EMAIL, RAW_PASSWORD, LICENSE_KEY]:
             if field is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                return {"message": "Important fields are missing. Please re-check!"},400
-                
+                return (
+                    {"message": "Important fields are missing. Please re-check!"},
+                    400,
+                )
 
         """ check if there is an user with this profile information already existed """
         client = MongoClient(host=DB_URI)
@@ -155,7 +172,7 @@ def _suppliment_register_route(cur_app):
 
         if dupl_user is not None:
             # HTTP response code 409: request is in conflict with server's resources ｡゜(｀Д´)゜｡
-            return {"message": "This user already existed. Forgot password?"}, 409            
+            return {"message": "This user already existed. Forgot password?"}, 409
         else:
             """ Check validity of the submitted license key """
             bank_col = db["bank"]
@@ -179,7 +196,7 @@ def _suppliment_register_route(cur_app):
             else:
                 # HTTP response code 403: Forbidden （╯°□°）╯︵( .o.)
                 return {"message": "Invalid license key. Please re-check!"}, 403
-                
+
 
 def supplement_auth_routes(app):
     """
@@ -188,7 +205,7 @@ def supplement_auth_routes(app):
         :param: `app`: <class 'flask.app.Flask'>
     """
     # JWT management need to be consistent throughout the Flask app
-    
+
     for suppliment_def in [
         _suppliment_login_route,
         _suppliment_logout_route,
@@ -196,5 +213,6 @@ def supplement_auth_routes(app):
     ]:
         suppliment_def(app)
 
-if __name__ == "__main__": 
+
+if __name__ == "__main__":
     pass
