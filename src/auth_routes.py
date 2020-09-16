@@ -34,60 +34,64 @@ def _suppliment_login_route(cur_app):
             
             :return: JWT access token if user is successfully logged in
         """
-        # basic_auth = f"Bearer {encoded_credentials}"
-        basic_auth = req.headers.get("Authorization")
-        encoded_credentials = basic_auth.split("Basic ")[1]
-        # decoded_credentials = f"{PHONE}:{RAW_PASSWORD}"
-        decoded_credentials = atob(encoded_credentials)
-        PHONE, RAW_PASSWORD = decoded_credentials.split(":")
+        try:
+            # basic_auth = f"Bearer {encoded_credentials}"
+            basic_auth = req.headers.get("Authorization")
+            encoded_credentials = basic_auth.split("Basic ")[1]
+            # decoded_credentials = f"{PHONE}:{RAW_PASSWORD}"
+            decoded_credentials = atob(encoded_credentials)
+            PHONE, RAW_PASSWORD = decoded_credentials.split(":")
 
-        logger.info(f"original credential string: {encoded_credentials}")
-        """ validation """
-        for field in [PHONE, RAW_PASSWORD]:
-            if field is None:
+            logger.info(f"original credential string: {encoded_credentials}")
+            """ validation """
+            for field in [PHONE, RAW_PASSWORD]:
+                if field is None:
+                    # HTTP response code 400: bad request ¯\_(ツ)_/¯
+                    return (
+                        jsonify(
+                            {"message": "Important fields are missing. Please re-check!"}
+                        ),
+                        400,
+                        {"Content-Type": "application/json"},
+                    )
+
+            """ authenticate """
+            client = MongoClient(host=DB_URI)
+            db = client[DB_NAME]
+            user_col = db["user"]
+            # get user
+            user_doc = user_col.find_one({"Phone": PHONE})
+
+            if user_doc is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
                 return (
                     jsonify(
-                        {"message": "Important fields are missing. Please re-check!"}
+                        {
+                            "message": "Your login credentials are incorrect. Please re-check!"
+                        }
                     ),
                     400,
                     {"Content-Type": "application/json"},
                 )
 
-        """ authenticate """
-        client = MongoClient(host=DB_URI)
-        db = client[DB_NAME]
-        user_col = db["user"]
-        # get user
-        user_doc = user_col.find_one({"Phone": PHONE})
+            else:
+                user_hashed_pwd = user_doc["Password"]
+                if user_hashed_pwd is None:
+                    logger.info("Connection with database is down.")
+                    # HTTP response code 500: internal server error (❍ᴥ❍ʋ)
+                    return jsonify({"message": "Internal server error!"}), 500
 
-        if user_doc is None:
-            # HTTP response code 400: bad request ¯\_(ツ)_/¯
-            return (
-                jsonify(
-                    {
-                        "message": "Your login credentials are incorrect. Please re-check!"
-                    }
-                ),
-                400,
-                {"Content-Type": "application/json"},
-            )
-
-        else:
-            user_hashed_pwd = user_doc["Password"]
-            if user_hashed_pwd is None:
-                logger.info("Connection with database is down.")
-                # HTTP response code 500: internal server error (❍ᴥ❍ʋ)
-                return jsonify({"message": "Internal server error!"}), 500
-
-            if check_password(RAW_PASSWORD, user_hashed_pwd):
-                # generate token string, in which `PHONE` is used as identification data
-                token = create_access_token(
-                    identity=PHONE, expires_delta=timedelta(minutes=15)
-                )
-                logger.info(f"Token generated: {token}")
-                # HTTP response code 201, ~(˘▾˘~) of which body contains a generated JWT code (~˘▾˘)~
-                return jsonify({"jwt": token}), 201, {"Content-Type": "application/json"}
+                if check_password(RAW_PASSWORD, user_hashed_pwd):
+                    # generate token string, in which `PHONE` is used as identification data
+                    token = create_access_token(
+                        identity=PHONE, expires_delta=timedelta(minutes=15)
+                    )
+                    logger.info(f"Token generated: {token}")
+                    # HTTP response code 201, ~(˘▾˘~) of which body contains a generated JWT code (~˘▾˘)~
+                    return jsonify({"jwt": token}), 201, {"Content-Type": "application/json"}
+        except (RuntimeError, TypeError, NameError) as e: 
+            logger.error(str(e))
+            return jsonify({"msg": "Internal server error"}), 500, {"Content-Type": "application/json"}
 
 
 def _suppliment_logout_route(cur_app):
