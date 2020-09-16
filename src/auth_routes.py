@@ -1,5 +1,5 @@
 from base64 import b64decode, b64encode
-from flask import request as req, jsonify
+from flask import request as req, json
 from pymongo import MongoClient, ReturnDocument
 from flask_jwt_extended import (
     JWTManager,
@@ -47,12 +47,14 @@ def _suppliment_login_route(cur_app):
             for field in [PHONE, RAW_PASSWORD]:
                 if field is None:
                     # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                    return (
-                        jsonify(
-                            {"message": "Important fields are missing. Please re-check!"}
+                    return cur_app.response_class(
+                        response=json.dumps(
+                            {
+                                "message": "Important fields are missing. Please re-check!"
+                            }
                         ),
-                        400,
-                        {"Content-Type": "application/json"},
+                        status=400,
+                        mimetype="application/json",
                     )
 
             """ authenticate """
@@ -64,14 +66,14 @@ def _suppliment_login_route(cur_app):
 
             if user_doc is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                return (
-                    jsonify(
+                return cur_app.response_class(
+                    response=json.dumps(
                         {
                             "message": "Your login credentials are incorrect. Please re-check!"
                         }
                     ),
-                    400,
-                    {"Content-Type": "application/json"},
+                    status=400,
+                    mimetype="application/json",
                 )
 
             else:
@@ -88,10 +90,25 @@ def _suppliment_login_route(cur_app):
                     )
                     logger.info(f"Token generated: {token}")
                     # HTTP response code 201, ~(˘▾˘~) of which body contains a generated JWT code (~˘▾˘)~
-                    return jsonify({"jwt": token}), 201, {"Content-Type": "application/json"}
-        except (RuntimeError, TypeError, NameError) as e: 
+                    return cur_app.response_class(
+                        response=json.dumps({"jwt": token}),
+                        status=201,
+                        mimetype="application/json",
+                    )
+        except RuntimeError as e:
             logger.error(str(e))
-            return jsonify({"msg": "Internal server error"}), 500, {"Content-Type": "application/json"}
+            return cur_app.response_class(
+                response=json.dumps({"msg": "Internal server error"}),
+                status=500,
+                mimetype="application/json",
+            )
+        except TypeError as e:
+            logger.error(str(e))
+            return cur_app.response_class(
+                response=json.dumps({"msg": "Internal server error"}),
+                status=500,
+                mimetype="application/json",
+            )
 
 
 def _suppliment_logout_route(cur_app):
@@ -128,11 +145,19 @@ def _suppliment_logout_route(cur_app):
         if returned_doc is not None:
             logger.info("Logout request successfully handled.")
             # HTTP response code 200: request succeeded
-            return jsonify({"message": "Successfully logged out!"}), 200, {"Content-Type": "application/json"}
+            return (
+                jsonify({"message": "Successfully logged out!"}),
+                200,
+                {"Content-Type": "application/json"},
+            )
         else:
             logger.info("Connection with database is down.")
             # HTTP response code 500: internal server error (❍ᴥ❍ʋ)
-            return jsonify({"message": "Internal server error!"}), 500, {"Content-Type": "application/json"}
+            return (
+                jsonify({"message": "Internal server error!"}),
+                500,
+                {"Content-Type": "application/json"},
+            )
 
 
 def _suppliment_register_route(cur_app):
