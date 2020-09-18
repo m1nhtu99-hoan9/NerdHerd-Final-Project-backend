@@ -55,8 +55,14 @@ def _supplement_crescore_route(cur_app):
                     update={"$push": {"SearchHistory": req_phone}},
                 )
 
-                # HTTP response code 200
-                return {"phone": req_phone, "score": customer_doc["CreditScore"]}, 200
+                if hasattr(customer_doc, "CreditScore"):
+                    # HTTP response code 200
+                    return (
+                        {"phone": req_phone, "score": customer_doc["CreditScore"]},
+                        200,
+                    )
+                else:
+                    return {"msg:": "Requested phone number doesn't exist"}, 400
 
 
 def _supplement_profile_route(cur_app):

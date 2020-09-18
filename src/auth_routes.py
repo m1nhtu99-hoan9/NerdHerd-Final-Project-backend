@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 from datetime import timedelta
 from logzero import logger  # console logger
 
-from .utils import check_password, hash_password, encode_token, decode_token, atob
+from . import check_password, hash_password, encode_token, decode_token, atob
 
 """
     Define authentication routes
@@ -34,6 +34,15 @@ def _suppliment_login_route(cur_app):
             
             :return: JWT access token if user is successfully logged in
         """
+
+        # default response
+        # if `response` is not re-assigned, this default response is returned
+        response = cur_app.response_class(
+            response="Something wicked happened on server uncaught!",
+            status=500,
+            mimetype="text/plain",
+        )
+
         try:
             # basic_auth = f"Bearer {encoded_credentials}"
             basic_auth = req.headers.get("Authorization")
@@ -47,7 +56,7 @@ def _suppliment_login_route(cur_app):
             for field in [PHONE, RAW_PASSWORD]:
                 if field is None:
                     # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                    return cur_app.response_class(
+                    response = cur_app.response_class(
                         response=json.dumps(
                             {
                                 "message": "Important fields are missing. Please re-check!"
@@ -56,6 +65,7 @@ def _suppliment_login_route(cur_app):
                         status=400,
                         mimetype="application/json",
                     )
+                    return response
 
             """ authenticate """
             client = MongoClient(host=DB_URI)
@@ -66,7 +76,7 @@ def _suppliment_login_route(cur_app):
 
             if user_doc is None:
                 # HTTP response code 400: bad request ¯\_(ツ)_/¯
-                return cur_app.response_class(
+                response = cur_app.response_class(
                     response=json.dumps(
                         {
                             "message": "Your login credentials are incorrect. Please re-check!"
@@ -75,13 +85,17 @@ def _suppliment_login_route(cur_app):
                     status=400,
                     mimetype="application/json",
                 )
-
             else:
                 user_hashed_pwd = user_doc["Password"]
                 if user_hashed_pwd is None:
                     logger.info("Connection with database is down.")
                     # HTTP response code 500: internal server error (❍ᴥ❍ʋ)
-                    return jsonify({"message": "Internal server error!"}), 500
+                    response = cur_app.response_class(
+                        response=json.dumps({"message": "Internal server error!"}),
+                        status=500,
+                        mimetype="application/json",
+                    )
+                    return response
 
                 if check_password(RAW_PASSWORD, user_hashed_pwd):
                     # generate token string, in which `PHONE` is used as identification data
@@ -90,11 +104,14 @@ def _suppliment_login_route(cur_app):
                     )
                     logger.info(f"Token generated: {token}")
                     # HTTP response code 201, ~(˘▾˘~) of which body contains a generated JWT code (~˘▾˘)~
-                    return cur_app.response_class(
+                    response = cur_app.response_class(
                         response=json.dumps({"jwt": token}),
                         status=201,
                         mimetype="application/json",
                     )
+
+            return response
+
         except RuntimeError as e:
             logger.error(str(e))
             return cur_app.response_class(
